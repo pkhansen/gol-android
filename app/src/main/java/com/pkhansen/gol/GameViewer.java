@@ -23,9 +23,13 @@ public class GameViewer extends View {
     // TODO - Drag screen
     // TODO - Controls
 
-    boolean mIsAnimating;
+
+
+    private boolean mIsAnimating;
     // Temp array for holding mBoard data
     private static byte[][] mBoard;
+    // Array that holds the originally drawn board for resetting
+    private static byte[][] mOrgBoard;
     // Temp array used as helper to update mRule
     private static Bitmap mBitmap;
     // Upscaled BitMap that is drawn
@@ -44,6 +48,9 @@ public class GameViewer extends View {
 
     private Rule mRule;
 
+    public boolean isAnimating() {
+        return mIsAnimating;
+    }
 
     public GameViewer(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -87,10 +94,20 @@ public class GameViewer extends View {
     }
 
     public void drawArray(byte[][] array) {
-        // Initialises the local mBoard variable
+        // Initialises the local mBoard variable as well as mOrgBoard
         if (mBoard == null) {
             mBoard = array;
+            mOrgBoard = array;
         }
+        createBmp(mBoard);
+        invalidate();
+    }
+
+    public void reset() {
+        if (mIsAnimating) {
+            startStop();
+        }
+        mBoard = mOrgBoard;
         createBmp(mBoard);
         invalidate();
     }
@@ -117,15 +134,14 @@ public class GameViewer extends View {
         createBmp(mBoard);
     }
 
-    public void isAnimating() {
-        System.out.println("Blerh");
+    public void startStop() {
         if (this.mIsAnimating) {
             this.mIsAnimating = false;
         }
         else {
             this.mIsAnimating = true;
+            invalidate();
         }
-        invalidate();
     }
 
 }

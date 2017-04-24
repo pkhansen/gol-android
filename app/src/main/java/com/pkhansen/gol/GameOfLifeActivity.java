@@ -1,9 +1,7 @@
 package com.pkhansen.gol;
 
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +20,7 @@ public class GameOfLifeActivity extends AppCompatActivity{
     int mScreenWidth;
     private byte[][] mArray;
     private Button mStart;
+    private Button mReset;
 
 
     GameViewer mGameViewer;
@@ -47,14 +46,35 @@ public class GameOfLifeActivity extends AppCompatActivity{
         mGameViewer.drawArray(mArray);
 
         mStart = (Button) findViewById(R.id.btn_is_animating);
+        mReset = (Button) findViewById(R.id.reset);
+
         mStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mGameViewer.isAnimating();
+                mGameViewer.startStop();
+                changeStartStopTxt();
+            }
+        });
+
+        mReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mGameViewer.reset();
+                changeStartStopTxt();
             }
         });
 
 
+
+    }
+
+    private void changeStartStopTxt() {
+        if (mStart.getText().equals("Start") && mGameViewer.isAnimating()) {
+            mStart.setText("Stop");
+        }
+        else {
+            mStart.setText("Start");
+        }
     }
 
     private static int getScreenWidth() {
