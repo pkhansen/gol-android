@@ -43,7 +43,7 @@
         jumboMode="true"
         optimize="true"
         revision="25.0.2"
-        sha1="203d1f0f5856f16f54a580564e60c0fc158103e3">
+        sha1="3b92fb6e6450cbc8f77cdb7c597aa7e72fda0784">
         <dex dex="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_1fd57ef13efa7f1f2a6362e8d0263734c234d608/classes.dex" />
     </item>
     <item

@@ -3,8 +3,11 @@ package com.pkhansen.gol;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -26,9 +29,25 @@ public class GameOfLifeActivity extends AppCompatActivity{
     GameViewer mGameViewer;
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gol);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Creates a GameViewer object that is linked to the GameViewer from the layout
         mGameViewer = (GameViewer) findViewById(R.id.gameViewer);

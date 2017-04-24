@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.pkhansen.gol.Model.Rule;
@@ -17,10 +18,8 @@ public class GameViewer extends View {
 
     // TODO - Have GameViewer height and width in activity layout scale along with bmp and array
     // TODO - Reset GameViewer if a new String is passed trough
-    // TODO - Reset Button
     // TODO - JAVADOC *BLERGH*
     // TODO - More dynamic mBoard
-    // TODO - Drag screen
     // TODO - Controls
 
 
@@ -41,7 +40,10 @@ public class GameViewer extends View {
     // Current Y position when drawing
     private int mYPoint;
     // Starting margin when drawing
-    private int mMargin;
+    private int mXOffset;
+    private int mYOffset;
+    private int mTempX;
+    private int mTempY;
     private int mScreenWidth;
     private int mBmpSize;
     private int mGameSpeed;
@@ -64,6 +66,12 @@ public class GameViewer extends View {
         mScreenWidth = getScreenWidth();
         mIsAnimating = false;
         mGameSpeed = 100;
+        setDefaultOffsets();
+    }
+
+    private void setDefaultOffsets() {
+        mXOffset = -(mScreenWidth/2);
+        mYOffset = -(mScreenWidth/2);
     }
 
     private void setBmpSize() {
@@ -75,10 +83,8 @@ public class GameViewer extends View {
         if (mRectWidth == 0) {
             mRectWidth = (mScreenWidth) / array.length;
         }
-        //mMargin = (mScreenWidth - (array.length * mRectWidth)) / 2;
-        //mBmpSize = mRectWidth * array[0].length;
+
         mBmpSize = mScreenWidth * 2;
-        mMargin = -(mScreenWidth/2);
 
         for (int y = 0; y < array.length; y++) {
             for (int x = 0; x < array[y].length; x++) {
@@ -107,6 +113,7 @@ public class GameViewer extends View {
         if (mIsAnimating) {
             startStop();
         }
+        setDefaultOffsets();
         mBoard = mOrgBoard;
         createBmp(mBoard);
         invalidate();
@@ -119,7 +126,7 @@ public class GameViewer extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-        canvas.drawBitmap(mScaledBmp, mMargin, mMargin, null);
+        canvas.drawBitmap(mScaledBmp, mXOffset, mYOffset, null);
 
         if (mIsAnimating) {
             nextGeneration();
@@ -144,4 +151,28 @@ public class GameViewer extends View {
         }
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int touchX = (int) event.getX();
+        int touchY = (int) event.getY();
+
+
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mTempX = touchX;
+                mTempY = touchY;
+            case MotionEvent.ACTION_MOVE:
+                mXOffset = mXOffset + (touchX - mTempX);
+                mYOffset = mYOffset + (touchY - mTempY);
+                mTempX = touchX;
+                mTempY = touchY;
+                invalidate();
+                break;
+            case MotionEvent.ACTION_UP:
+                //invalidate();
+                break;
+        }
+        return true;
+    }
 }
