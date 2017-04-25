@@ -74,10 +74,12 @@ public class GameViewer extends View {
         mYOffset = -(mScreenWidth/2);
     }
 
-    private void setBmpSize() {
-
-    }
-
+    /**
+     * Creates a Bitmap based on the array that represents the board.
+     * This is then scaled and updates the member variable mScaledBmp
+     *
+     * @param array - Array that represents the game board
+     */
     public void createBmp (byte[][] array) {
         mBitmap = Bitmap.createBitmap(array[0].length, array.length, Bitmap.Config.ARGB_8888);
         if (mRectWidth == 0) {
@@ -99,7 +101,12 @@ public class GameViewer extends View {
         mScaledBmp = Bitmap.createScaledBitmap(mBitmap, mBmpSize, mBmpSize, false);
     }
 
-    public void drawArray(byte[][] array) {
+    /**
+     * Initialises and updates the bitmap.
+     * The onDraw method is then called with invalidate() so that the bitmap is displayed.
+     * @param array
+     */
+    public void initArray(byte[][] array) {
         // Initialises the local mBoard variable as well as mOrgBoard
         if (mBoard == null) {
             mBoard = array;
@@ -109,6 +116,9 @@ public class GameViewer extends View {
         invalidate();
     }
 
+    /**
+     * Resets the bitmap to its original state
+     */
     public void reset() {
         if (mIsAnimating) {
             startStop();
@@ -141,6 +151,9 @@ public class GameViewer extends View {
         createBmp(mBoard);
     }
 
+    /**
+     * Starts or stops the animation depending on the current state.
+     */
     public void startStop() {
         if (this.mIsAnimating) {
             this.mIsAnimating = false;
@@ -151,6 +164,7 @@ public class GameViewer extends View {
         }
     }
 
+    // Implements touch controls
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int touchX = (int) event.getX();

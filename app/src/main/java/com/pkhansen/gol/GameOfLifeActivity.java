@@ -1,9 +1,10 @@
 package com.pkhansen.gol;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -24,9 +25,9 @@ public class GameOfLifeActivity extends AppCompatActivity{
     private byte[][] mArray;
     private Button mStart;
     private Button mReset;
-
-
-    GameViewer mGameViewer;
+    private GameViewer mGameViewer;
+    private View mLoadingSpinner;
+    private int mAnimationDur;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -49,10 +50,15 @@ public class GameOfLifeActivity extends AppCompatActivity{
         setContentView(R.layout.activity_gol);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Creates a GameViewer object that is linked to the GameViewer from the layout
+        // Initialises the different view objects
+        mStart = (Button) findViewById(R.id.btn_is_animating);
+        mReset = (Button) findViewById(R.id.reset);
         mGameViewer = (GameViewer) findViewById(R.id.gameViewer);
+        mLoadingSpinner = findViewById(R.id.loading_spinner);
 
-        // Init of field variables
+        mAnimationDur = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+        loadingAnimation();
 
         // Connects the string that was created from the previous activity
         mString = getIntent().getExtras().getString("TextField");
@@ -62,11 +68,11 @@ public class GameOfLifeActivity extends AppCompatActivity{
         // Generates GameOfLifeActivity code and saves it as a Array.
         mArray = generateQRCode(mString);
         mArray = makeGameBoardBigger(mArray);
-        mGameViewer.drawArray(mArray);
 
-        mStart = (Button) findViewById(R.id.btn_is_animating);
-        mReset = (Button) findViewById(R.id.reset);
+        mGameViewer.initArray(mArray);
 
+
+        // Listener for the Start/Stop button
         mStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,6 +81,7 @@ public class GameOfLifeActivity extends AppCompatActivity{
             }
         });
 
+        // Listener for the reset button
         mReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,6 +92,32 @@ public class GameOfLifeActivity extends AppCompatActivity{
 
 
 
+    }
+
+    private void loadingAnimation() {
+        View[] viewArr = {mStart, mGameViewer, mReset};
+
+        for (View views : viewArr) {
+            views.setAlpha(0f);
+            views.setVisibility(View.VISIBLE);
+        }
+
+        for (View views: viewArr) {
+            views.animate()
+                    .alpha(1f)
+                    .setDuration(mAnimationDur)
+                    .setListener(null);
+        }
+
+        mLoadingSpinner.animate()
+                .alpha(0f)
+                .setDuration(mAnimationDur)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mLoadingSpinner.setVisibility(View.GONE);
+                    }
+                });
     }
 
     private void changeStartStopTxt() {
@@ -151,15 +184,16 @@ public class GameOfLifeActivity extends AppCompatActivity{
 
         } catch (WriterException e) {
             //Log.e("GameOfLifeActivity ERROR", ""+e);
-            return new byte[20][20];
+            return null;
         }
 
     }
 
+    // Places the board in a bigger array.
     private byte[][] makeGameBoardBigger(byte[][] arr) {
-        int marginHeight = (int) (arr.length);
+        int marginHeight = (int) (arr.length * 0.8);
         int heightOfArray = arr.length + (marginHeight * 2);
-        int marginWidth = (int) (arr[0].length);
+        int marginWidth = (int) (arr[0].length * 0.8);
         int widthOfArray = arr[0].length + (marginWidth * 2);
 
         byte[][] newArr = new byte[heightOfArray][widthOfArray];
