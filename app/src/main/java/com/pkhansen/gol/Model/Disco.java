@@ -1,4 +1,4 @@
-package com.pkhansen.gol;
+package com.pkhansen.gol.Model;
 import android.graphics.Color;
 import java.util.Random;
 
@@ -19,10 +19,17 @@ public class Disco {
             "#D2E6DD"
     };
 
+    /**
+     * Returns a random color from the mColors array
+     * @return - int representing a given color
+     */
     public int getColor() {
         mNewColor = false;
         String color;
         int intColor = 1;
+
+        // While loop that makes sure that the random color isn't the same as last one.
+        // Makes for a more fluid animation as a whole.
         while (!mNewColor) {
             Random randomGenerator = new Random();
             int rand = randomGenerator.nextInt(mColors.length);

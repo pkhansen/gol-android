@@ -2,6 +2,7 @@ package com.pkhansen.gol;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.graphics.Paint;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +25,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 
 public class GameOfLifeActivity extends AppCompatActivity{
+
     String mString;
     ImageView mQRImage;
     int mScreenWidth;
@@ -68,10 +71,10 @@ public class GameOfLifeActivity extends AppCompatActivity{
         mSizeBar = (SeekBar) findViewById(R.id.seekBar_Size);
         mDisco = (Button) findViewById(R.id.btn_disco);
         mConstraintLayout = (ConstraintLayout) findViewById(R.id.contraintLayout);
-
         mAnimationDur = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
         loadingAnimation();
+
 
         // Connects the string that was created from the previous activity
         mString = getIntent().getExtras().getString("TextField");
@@ -133,7 +136,7 @@ public class GameOfLifeActivity extends AppCompatActivity{
         mSizeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mGameViewer.setRectWidth(progress);
+                mGameViewer.setCellSize(progress);
             }
 
             @Override
@@ -150,6 +153,9 @@ public class GameOfLifeActivity extends AppCompatActivity{
 
     }
 
+    /**
+     * Resets the SeekBar representing the size of the cells
+     */
     public static void resetSizeSeekBar() {
         mSizeBar.setProgress(2);
     }
@@ -157,11 +163,14 @@ public class GameOfLifeActivity extends AppCompatActivity{
     private void loadingAnimation() {
         View[] viewArr = {mStart, mGameViewer, mReset};
 
+        // Applies alpha rendering the views invisible while at the same time
+        // setting them as visible. This to set up for the transition effect underneath.
         for (View views : viewArr) {
             views.setAlpha(0f);
             views.setVisibility(View.VISIBLE);
         }
 
+        // Transitions the views to a visible alpha
         for (View views: viewArr) {
             views.animate()
                     .alpha(1f)
@@ -169,6 +178,7 @@ public class GameOfLifeActivity extends AppCompatActivity{
                     .setListener(null);
         }
 
+        // Fades out the spinner
         mLoadingSpinner.animate()
                 .alpha(0f)
                 .setDuration(mAnimationDur)
@@ -218,15 +228,21 @@ public class GameOfLifeActivity extends AppCompatActivity{
         QRCodeWriter writer = new QRCodeWriter();
 
         try {
-            // Lager et BitMatrix med GameOfLifeActivity.
+            // Creates a bitMatrix containing the QR code using the String "s"
             BitMatrix bitMatrix = writer.encode(s, BarcodeFormat.QR_CODE, mScreenWidth, mScreenWidth);
             byte[][] array;
 
+            // Gets the coordinates of the top-left-most pixel that is part of a cell
             int[] topLeft = bitMatrix.getTopLeftOnBit();
-
-
             int top = topLeft[1];
             int left = topLeft[0];
+
+            /* count represents the number of bits that makes up
+            the width of the top-left fixed square of a QR code.
+            This is used to find out how to condense the bitMatrix
+            down to a smaller byte array where 1 byte represents
+            a whole cell.
+             */
             int count = 0;
             while (bitMatrix.get(left, top)) {
                 count++;
@@ -234,9 +250,11 @@ public class GameOfLifeActivity extends AppCompatActivity{
             }
             left = topLeft[0];
 
-            // Gives how many pixels that makes up a cell.
+            // Gives how many bits that makes up a cell.
             int cellSize = (count/7);
-            int numberOfCellsRow = (1080 - left) / cellSize;
+            // Represents the number of cells per row
+            int numberOfCellsRow = (mScreenWidth - left) / cellSize;
+            System.out.println(numberOfCellsRow);
 
             array = new byte[numberOfCellsRow][numberOfCellsRow];
             for (int y = 0; y < numberOfCellsRow; y++) {
@@ -254,7 +272,7 @@ public class GameOfLifeActivity extends AppCompatActivity{
 
 
         } catch (WriterException e) {
-            //Log.e("GameOfLifeActivity ERROR", ""+e);
+            System.err.println("Error while encoding the QR code");
             return null;
         }
 
@@ -262,6 +280,8 @@ public class GameOfLifeActivity extends AppCompatActivity{
 
     // Places the board in a bigger array.
     private byte[][] makeGameBoardBigger(byte[][] arr) {
+
+        // Sets up support variables for expanding the game board
         int marginHeight = (int) (arr.length * 0.5);
         int heightOfArray = (int) Math.floor(arr.length + (marginHeight * 2));
         int widthOfArray = heightOfArray;
@@ -277,8 +297,5 @@ public class GameOfLifeActivity extends AppCompatActivity{
         return newArr;
     }
 
-    private void draw (Canvas canvas, Paint pain) {
-
-    }
 
 }

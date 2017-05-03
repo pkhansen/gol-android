@@ -8,18 +8,15 @@ import android.graphics.Color;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.pkhansen.gol.Model.Disco;
 import com.pkhansen.gol.Model.Rule;
 
 
 public class GameViewer extends View {
-
-    // TODO - Reset GameViewer if a new String is passed trough
-    // TODO - JAVADOC *BLERGH*
-    // TODO - More Controls
-    // TODO - Create separate thread for bitmap processing
 
 
     private boolean mIsAnimating;
@@ -46,8 +43,8 @@ public class GameViewer extends View {
     private int mTempY;
     private int mScreenWidth;
     private int mBmpSize;
-    private int mRectWidth;
-    private int[] mRectWidths;
+    private int mCellSize;
+    private int[] mCellSizes;
 
     // GAME SPEED VARIABLES
     private int mGameSpeed;
@@ -74,8 +71,9 @@ public class GameViewer extends View {
 
     }
 
+    // Initializes some of the key variables used.
     private void initGameViewer() {
-        mRectWidth = 0;
+        mCellSize = 0;
         mScreenWidth = getScreenWidth();
         mIsAnimating = false;
         initGameSpeeds();
@@ -83,23 +81,22 @@ public class GameViewer extends View {
         mDisco = new Disco();
     }
 
+    /**
+     * Initializes the main game speed
+     * and also sets up an array of other game speeds that can be selected through the GUI.
+      */
     private void initGameSpeeds() {
 
-        mGameSpeed = 80;
+        mGameSpeed = 50;
         mGameSpeeds = new int[4];
 
-        // Sets up the different gamespeed based on the original speed.
+        // Sets up the different games peed based on the original speed.
         for (int i = 0; i < mGameSpeeds.length; i++) {
             double factor = ((0.5 * i) + 0.5);
             System.out.println(factor);
             double tempGameSpeed = factor * mGameSpeed;
             mGameSpeeds[mGameSpeeds.length - 1 - i] = (int) tempGameSpeed;
         }
-    }
-
-    private void setColors (Color cell, Color bg) {
-        this.cellColor = cell;
-        this.backgroundColor = bg;
     }
 
     // Sets up the starting offsets for drawing as well as offsets for the reset method
@@ -126,13 +123,19 @@ public class GameViewer extends View {
      * @param array - Array that represents the game board
      */
     public void createBmp (byte[][] array) {
+        // Creates a bitmap that fits the size of the array that's going to be used to draw to it.
         mBitmap = Bitmap.createBitmap(array[0].length, array.length, Bitmap.Config.ARGB_8888);
-        if (mRectWidth == 0) {
-            initRectWith(array);
+
+        // Initializes the variable representing cell size if the method is running for the first time.
+        if (mCellSize == 0) {
+            initCellSize(array);
         }
 
-        mBmpSize = (int) Math.floor((mRectWidth * array.length) * 1.5);
+        // Calculates the bitmap size based on the cellsize and size
+        // (basically screen width in this case) for the array.
+        mBmpSize = (int) Math.floor((mCellSize * array.length) * 1.5);
 
+        // "Draws" to the bitmap using the array created from the QR code
         for (int y = 0; y < array.length; y++) {
             for (int x = 0; x < array[y].length; x++) {
                 if (array[y][x] == 1) {
@@ -142,15 +145,21 @@ public class GameViewer extends View {
                 }
             }
         }
+        // Scales the bitmap that is later drawn
         mScaledBmp = Bitmap.createScaledBitmap(mBitmap, mBmpSize, mBmpSize, false);
     }
 
-    private void initRectWith(byte[][] array) {
-        mRectWidth = (mScreenWidth / array.length);
-        mRectWidths = new int[3];
-        mRectWidths[0] = (int) (mRectWidth * 0.4);
-        mRectWidths[1] = (int) (mRectWidth * 0.8);
-        mRectWidths[2] = mRectWidth;
+    /**
+     * Initializes the main cell size along with some of
+     * the different sizes that can be selected in the GUI
+     * @param array
+     */
+    private void initCellSize(byte[][] array) {
+        mCellSize = (mScreenWidth / array.length);
+        mCellSizes = new int[3];
+        mCellSizes[0] = (int) (mCellSize * 0.4);
+        mCellSizes[1] = (int) (mCellSize * 0.8);
+        mCellSizes[2] = mCellSize;
     }
 
     /**
@@ -170,14 +179,15 @@ public class GameViewer extends View {
     }
 
     /**
-     * Resets the bitmap to its original state
+     * Resets the gameviewer almost completely.
+     * Speed and DISCO? will be unchanged.
      */
     public void reset() {
         if (mIsAnimating) {
             startStop();
         }
         GameOfLifeActivity.resetSizeSeekBar();
-        setRectWidth(2);
+        setCellSize(2);
         resetOffsets();
         mBoard = mOrgBoard;
         createBmp(mBoard);
@@ -195,11 +205,13 @@ public class GameViewer extends View {
         mDiscoCounter += 1;
         canvas.drawBitmap(mScaledBmp, mXOffset, mYOffset, null);
 
+        // Paces out the change of color to make it a little less intrusive
         if (mDiscoIsOn && mDiscoCounter >= 5) {
             GameOfLifeActivity.setColor(mDisco.getColor());
             mDiscoCounter = 0;
         }
 
+        // Checks if its animating and puts the computer to sleep based on the current game speed
         if (mIsAnimating) {
             nextGeneration();
             createBmp(mBoard);
@@ -240,8 +252,8 @@ public class GameViewer extends View {
         mGameSpeed = mGameSpeeds[i];
     }
 
-    public void setRectWidth(int i) {
-        mRectWidth = mRectWidths[i];
+    public void setCellSize(int i) {
+        mCellSize = mCellSizes[i];
     }
 
     /**
@@ -275,6 +287,9 @@ public class GameViewer extends View {
         return true;
     }
 
+    /**
+     * Toggles the rhytmic background change on/off
+     */
     public void toggleDisco() {
         if (mDiscoIsOn) {
             mDiscoIsOn = false;
@@ -283,4 +298,6 @@ public class GameViewer extends View {
             mDiscoIsOn = true;
         }
     }
+
+
 }

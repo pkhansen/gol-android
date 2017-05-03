@@ -20,15 +20,6 @@
         <dex dex="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/pre-dexed/debug/android-core-3.3.0_3ba6ba4222bfbff5b943dec6fc67be80e0a0edc0.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="510aa6efc159983dfbffa676a0dae37568c0a46f">
-        <dex dex="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_b79fc20b402ba4b00c2ab9ffd24d430a0f1c16a1/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/libs/core-3.2.1.jar"
         jumboMode="false"
@@ -39,11 +30,20 @@
     </item>
     <item
         is-multidex="true"
+        jar="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="510aa6efc159983dfbffa676a0dae37568c0a46f">
+        <dex dex="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_b79fc20b402ba4b00c2ab9ffd24d430a0f1c16a1/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.2"
-        sha1="3b92fb6e6450cbc8f77cdb7c597aa7e72fda0784">
+        sha1="f65f1c6bc776db5c74711e784f72126caf97769f">
         <dex dex="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_1fd57ef13efa7f1f2a6362e8d0263734c234d608/classes.dex" />
     </item>
     <item
