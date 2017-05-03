@@ -10,44 +10,54 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.SeekBar;
 
 import com.pkhansen.gol.Model.Rule;
 
 
 public class GameViewer extends View {
 
-    // TODO - Have GameViewer height and width in activity layout scale along with bmp and array
     // TODO - Reset GameViewer if a new String is passed trough
     // TODO - JAVADOC *BLERGH*
-    // TODO - More dynamic mBoard
-    // TODO - Controls
-
+    // TODO - More Controls
+    // TODO - Create separate thread for bitmap processing
 
 
     private boolean mIsAnimating;
+
+    // GAME BOARDS
     // Temp array for holding mBoard data
     private static byte[][] mBoard;
     // Array that holds the originally drawn board for resetting
     private static byte[][] mOrgBoard;
+
+    // GRAPHIC VARIABLES
     // Temp array used as helper to update mRule
     private static Bitmap mBitmap;
     // Upscaled BitMap that is drawn
     private static Bitmap mScaledBmp;
     // With of the drawn recatngle of each cell
-    private int mRectWidth;
-    // Current X position when drawing
-    private int mXPoint;
-    // Current Y position when drawing
-    private int mYPoint;
-    // Starting margin when drawing
+
+    // SUPPORT VARIABLES FOR DRAWING
     private int mXOffset;
     private int mYOffset;
+    private int mDefYOffset;
+    private int mDefXOffset;
     private int mTempX;
     private int mTempY;
     private int mScreenWidth;
     private int mBmpSize;
-    private int mGameSpeed;
+    private int mRectWidth;
+    private int[] mRectWidths;
 
+    // GAME SPEED VARIABLES
+    private int mGameSpeed;
+    private int[] mGameSpeeds;
+
+    private Color cellColor;
+    private Color backgroundColor;
+
+    // GAME RULES
     private Rule mRule;
 
     public boolean isAnimating() {
@@ -57,21 +67,50 @@ public class GameViewer extends View {
     public GameViewer(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initGameViewer();
+
     }
 
     private void initGameViewer() {
         mRectWidth = 0;
-        mXPoint = 0;
-        mYPoint = 0;
         mScreenWidth = getScreenWidth();
         mIsAnimating = false;
-        mGameSpeed = 100;
-        setDefaultOffsets();
+        initGameSpeeds();
     }
 
+    private void initGameSpeeds() {
+
+        mGameSpeed = 80;
+        mGameSpeeds = new int[4];
+
+        // Sets up the different gamespeed based on the original speed.
+        for (int i = 0; i < mGameSpeeds.length; i++) {
+            double factor = ((0.5 * i) + 0.5);
+            System.out.println(factor);
+            double tempGameSpeed = factor * mGameSpeed;
+            mGameSpeeds[mGameSpeeds.length - 1 - i] = (int) tempGameSpeed;
+        }
+    }
+
+    private void setColors (Color cell, Color bg) {
+        this.cellColor = cell;
+        this.backgroundColor = bg;
+    }
+
+    // Sets up the starting offsets for drawing as well as offsets for the reset method
     private void setDefaultOffsets() {
-        mXOffset = -(mScreenWidth/2);
-        mYOffset = -(mScreenWidth/2);
+        mYOffset = - (mScreenWidth / 4);
+        mXOffset = mYOffset;
+        mDefYOffset = mYOffset;
+        mDefXOffset = mXOffset;
+
+
+    }
+
+    // Support method for resetting the board.
+    // Sets the offsets used for drawing as the defaults from when the board was initialised
+    private void resetOffsets() {
+        mYOffset = mDefYOffset;
+        mXOffset = mDefXOffset;
     }
 
     /**
@@ -83,10 +122,10 @@ public class GameViewer extends View {
     public void createBmp (byte[][] array) {
         mBitmap = Bitmap.createBitmap(array[0].length, array.length, Bitmap.Config.ARGB_8888);
         if (mRectWidth == 0) {
-            mRectWidth = (mScreenWidth) / array.length;
+            initRectWith(array);
         }
 
-        mBmpSize = mScreenWidth * 2;
+        mBmpSize = (int) Math.floor((mRectWidth * array.length) * 1.5);
 
         for (int y = 0; y < array.length; y++) {
             for (int x = 0; x < array[y].length; x++) {
@@ -97,8 +136,15 @@ public class GameViewer extends View {
                 }
             }
         }
-        // TODO - Fix so that bitmap scales according to previous shape.
         mScaledBmp = Bitmap.createScaledBitmap(mBitmap, mBmpSize, mBmpSize, false);
+    }
+
+    private void initRectWith(byte[][] array) {
+        mRectWidth = (mScreenWidth / array.length);
+        mRectWidths = new int[3];
+        mRectWidths[0] = (int) (mRectWidth * 0.4);
+        mRectWidths[1] = (int) (mRectWidth * 0.8);
+        mRectWidths[2] = mRectWidth;
     }
 
     /**
@@ -112,6 +158,7 @@ public class GameViewer extends View {
             mBoard = array;
             mOrgBoard = array;
         }
+        setDefaultOffsets();
         createBmp(mBoard);
         invalidate();
     }
@@ -123,7 +170,9 @@ public class GameViewer extends View {
         if (mIsAnimating) {
             startStop();
         }
-        setDefaultOffsets();
+        GameOfLifeActivity.resetSizeSeekBar();
+        setRectWidth(2);
+        resetOffsets();
         mBoard = mOrgBoard;
         createBmp(mBoard);
         invalidate();
@@ -133,18 +182,27 @@ public class GameViewer extends View {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
     }
 
+    // General drawing method that also contains a REALLY primitive animation function
     @Override
     protected void onDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
         canvas.drawBitmap(mScaledBmp, mXOffset, mYOffset, null);
 
+
+
         if (mIsAnimating) {
             nextGeneration();
+            createBmp(mBoard);
+
             SystemClock.sleep(mGameSpeed);
             invalidate();
+
         }
     }
 
+    /**
+     * Updates the mBoard with the standard conway rules
+     */
     private void nextGeneration() {
         mRule = new Rule(mBoard);
         mBoard = mRule.conwaysBoardRules();
@@ -164,27 +222,44 @@ public class GameViewer extends View {
         }
     }
 
-    // Implements touch controls
-    @Override
+    /**
+     * Updates the mGameSpeed to the game speed found in the mGameSpeeds array with the given int
+     * @param i - Value that defines what game speed to get. In this case it's coming from a seekBar.
+     */
+    public void setGameSpeed(int i) {
+        mGameSpeed = mGameSpeeds[i];
+    }
+
+    public void setRectWidth(int i) {
+        mRectWidth = mRectWidths[i];
+    }
+
+    /**
+     * Method for supporting drag motions
+     */
     public boolean onTouchEvent(MotionEvent event) {
+        // Variables that keeps track the user touch
         int touchX = (int) event.getX();
         int touchY = (int) event.getY();
 
-
-
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                // Updates the temporary X and Y coordinate at first touch
                 mTempX = touchX;
                 mTempY = touchY;
             case MotionEvent.ACTION_MOVE:
+                // Updates the member variables that offsets the drawing
+                // according to the users drag movement
                 mXOffset = mXOffset + (touchX - mTempX);
                 mYOffset = mYOffset + (touchY - mTempY);
+
+                //Updates the temporary X and Y coordinate
+                // in case user drags in another direction
                 mTempX = touchX;
                 mTempY = touchY;
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                //invalidate();
                 break;
         }
         return true;

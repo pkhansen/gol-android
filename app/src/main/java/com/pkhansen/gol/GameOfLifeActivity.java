@@ -12,11 +12,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+
 
 public class GameOfLifeActivity extends AppCompatActivity{
     String mString;
@@ -28,6 +30,9 @@ public class GameOfLifeActivity extends AppCompatActivity{
     private GameViewer mGameViewer;
     private View mLoadingSpinner;
     private int mAnimationDur;
+    private SeekBar mSpeedBar;
+    private static SeekBar mSizeBar;
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -55,6 +60,8 @@ public class GameOfLifeActivity extends AppCompatActivity{
         mReset = (Button) findViewById(R.id.reset);
         mGameViewer = (GameViewer) findViewById(R.id.gameViewer);
         mLoadingSpinner = findViewById(R.id.loading_spinner);
+        mSpeedBar = (SeekBar) findViewById(R.id.seekBar_Speed);
+        mSizeBar = (SeekBar) findViewById(R.id.seekBar_Size);
 
         mAnimationDur = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -90,8 +97,46 @@ public class GameOfLifeActivity extends AppCompatActivity{
             }
         });
 
+        mSpeedBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mGameViewer.setGameSpeed(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        mSizeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mGameViewer.setRectWidth(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
 
+    }
+
+    public static void resetSizeSeekBar() {
+        mSizeBar.setProgress(2);
     }
 
     private void loadingAnimation() {
@@ -149,7 +194,6 @@ public class GameOfLifeActivity extends AppCompatActivity{
             byte[][] array;
 
             int[] topLeft = bitMatrix.getTopLeftOnBit();
-            System.out.println(topLeft.length);
 
 
             int top = topLeft[1];
@@ -159,12 +203,10 @@ public class GameOfLifeActivity extends AppCompatActivity{
                 count++;
                 left++;
             }
-            System.out.println(count);
             left = topLeft[0];
 
             // Gives how many pixels that makes up a cell.
             int cellSize = (count/7);
-            System.out.println("Cellsize: " + cellSize);
             int numberOfCellsRow = (1080 - left) / cellSize;
 
             array = new byte[numberOfCellsRow][numberOfCellsRow];
@@ -191,10 +233,10 @@ public class GameOfLifeActivity extends AppCompatActivity{
 
     // Places the board in a bigger array.
     private byte[][] makeGameBoardBigger(byte[][] arr) {
-        int marginHeight = (int) (arr.length * 0.8);
-        int heightOfArray = arr.length + (marginHeight * 2);
-        int marginWidth = (int) (arr[0].length * 0.8);
-        int widthOfArray = arr[0].length + (marginWidth * 2);
+        int marginHeight = (int) (arr.length * 0.5);
+        int heightOfArray = (int) Math.floor(arr.length + (marginHeight * 2));
+        int widthOfArray = heightOfArray;
+        int marginWidth = marginHeight;
 
         byte[][] newArr = new byte[heightOfArray][widthOfArray];
 
