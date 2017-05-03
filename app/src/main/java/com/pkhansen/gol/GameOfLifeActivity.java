@@ -4,7 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -31,7 +33,9 @@ public class GameOfLifeActivity extends AppCompatActivity{
     private View mLoadingSpinner;
     private int mAnimationDur;
     private SeekBar mSpeedBar;
+    private Button mDisco;
     private static SeekBar mSizeBar;
+    private static ConstraintLayout mConstraintLayout;
 
 
     @Override
@@ -57,11 +61,13 @@ public class GameOfLifeActivity extends AppCompatActivity{
 
         // Initialises the different view objects
         mStart = (Button) findViewById(R.id.btn_is_animating);
-        mReset = (Button) findViewById(R.id.reset);
+        mReset = (Button) findViewById(R.id.btn_reset);
         mGameViewer = (GameViewer) findViewById(R.id.gameViewer);
         mLoadingSpinner = findViewById(R.id.loading_spinner);
         mSpeedBar = (SeekBar) findViewById(R.id.seekBar_Speed);
         mSizeBar = (SeekBar) findViewById(R.id.seekBar_Size);
+        mDisco = (Button) findViewById(R.id.btn_disco);
+        mConstraintLayout = (ConstraintLayout) findViewById(R.id.contraintLayout);
 
         mAnimationDur = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -94,6 +100,15 @@ public class GameOfLifeActivity extends AppCompatActivity{
             public void onClick(View v) {
                 mGameViewer.reset();
                 changeStartStopTxt();
+            }
+        });
+
+        // Listener for the disco button
+        mDisco.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mGameViewer.toggleDisco();
+                changeDiscoTxt();
             }
         });
 
@@ -165,6 +180,16 @@ public class GameOfLifeActivity extends AppCompatActivity{
                 });
     }
 
+    private void changeDiscoTxt() {
+        if (mDisco.getText().equals("DISCO?")) {
+            mDisco.setText("WHITE");
+        }
+        else {
+            mDisco.setText("DISCO?");
+            setColor(Color.WHITE);
+        }
+    }
+
     private void changeStartStopTxt() {
         if (mStart.getText().equals("Start") && mGameViewer.isAnimating()) {
             mStart.setText("Stop");
@@ -172,6 +197,10 @@ public class GameOfLifeActivity extends AppCompatActivity{
         else {
             mStart.setText("Start");
         }
+    }
+
+    public static void setColor(int color) {
+        mConstraintLayout.setBackgroundColor(color);
     }
 
     private static int getScreenWidth() {

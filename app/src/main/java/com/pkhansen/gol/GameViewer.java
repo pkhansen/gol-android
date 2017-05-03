@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.SeekBar;
 
 import com.pkhansen.gol.Model.Rule;
 
@@ -64,6 +63,11 @@ public class GameViewer extends View {
         return mIsAnimating;
     }
 
+    // FUN
+    private Disco mDisco;
+    private boolean mDiscoIsOn;
+    private int mDiscoCounter;
+
     public GameViewer(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initGameViewer();
@@ -75,6 +79,8 @@ public class GameViewer extends View {
         mScreenWidth = getScreenWidth();
         mIsAnimating = false;
         initGameSpeeds();
+        mDiscoIsOn = false;
+        mDisco = new Disco();
     }
 
     private void initGameSpeeds() {
@@ -186,9 +192,13 @@ public class GameViewer extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
+        mDiscoCounter += 1;
         canvas.drawBitmap(mScaledBmp, mXOffset, mYOffset, null);
 
-
+        if (mDiscoIsOn && mDiscoCounter >= 5) {
+            GameOfLifeActivity.setColor(mDisco.getColor());
+            mDiscoCounter = 0;
+        }
 
         if (mIsAnimating) {
             nextGeneration();
@@ -263,5 +273,14 @@ public class GameViewer extends View {
                 break;
         }
         return true;
+    }
+
+    public void toggleDisco() {
+        if (mDiscoIsOn) {
+            mDiscoIsOn = false;
+        }
+        else {
+            mDiscoIsOn = true;
+        }
     }
 }
