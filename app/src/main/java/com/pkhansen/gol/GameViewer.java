@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -227,7 +226,7 @@ public class GameViewer extends View {
      */
     private void nextGeneration() {
         mRule = new Rule(mBoard);
-        mBoard = mRule.conwaysBoardRules();
+        mBoard = mRule.applyRules();
         createBmp(mBoard);
     }
 

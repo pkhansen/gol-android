@@ -2,11 +2,8 @@ package com.pkhansen.gol;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -60,7 +57,6 @@ public class GameOfLifeActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gol);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Initialises the different view objects
         mStart = (Button) findViewById(R.id.btn_is_animating);

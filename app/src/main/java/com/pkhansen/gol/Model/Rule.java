@@ -2,8 +2,11 @@ package com.pkhansen.gol.Model;
 
 import java.util.Arrays;
 
-/* This class handles the rules for the application. A board object is
+/**
+ * This class handles the rules for the application. A board object is
  * imported, manipulated and returned to the calling method.
+ *
+ * This is a stripped down version of the one we use in the actual project
  *
  */
 
@@ -16,80 +19,16 @@ public class Rule {
     private static int[] survivor = {2, 3};
     private static int[] born = {3};
 
-
-    public static int[] getSurvivor() {
-        return survivor;
-    }
-
-    public static int[] getBorn() {
-        return born;
-    }
-
-    // Class constructor
     public Rule (byte[][] currentBoard) {
         this.currentBoard = currentBoard;
     }
 
-
-    public byte[][] getCurrentBoard() {
-        return currentBoard;
-    }
-
-    public void setCurrentBoard(byte[][] board) {
-        this.currentBoard = board;
-    }
-
-    // Returns next generation values
-    @Override
-    public String toString(){
-        String output = "";
-
-        for (int row = 0; row < currentBoard.length; row++) {
-            for (int col = 0; col < currentBoard[0].length; col++){
-                output = output + currentBoard[row][col];
-            }
-        }
-        return output;
-    }
-
-    // Rules to invert the board (dead becomes alive vice versa)
-    public byte[][] invertBoard() {
-
-        ruledBoard = new byte[currentBoard.length][currentBoard.length];
-
-        for (int k = 0; k < ruledBoard.length; k++) {
-
-            for (int l = 0; l < ruledBoard.length; l++ ) {
-                if (currentBoard[k][l] == 1) {
-                    ruledBoard[k][l] = 0;
-                } else {
-                    ruledBoard[k][l] = 1;
-                }
-
-            }
-        }
-
-        return ruledBoard;
-    }
-
-
-    public static void setRules(int[] s, int[] b) {
-        survivor = s;
-        born = b;
-    }
-
-    public void checkRule (int[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            System.out.print(arr[i]);
-        }
-        System.out.println("");
-    }
-
-    public void checkRules () {
-        checkRule(survivor);
-        checkRule(born);
-    }
-
+    /**
+     * Checks if a given cellState combined with number of neighbors means the cell will survive
+     * @param neighbors  number of neighbors
+     * @param cellState  current cellState (dead or alive)
+     * @return  a byte of 1 or 0 where 1 is alive and 0 is dead.
+     */
     public byte checkIfOnOrOff(int neighbors, int cellState) {
         if (cellState == 1) {
             for (int s : survivor) {
@@ -109,8 +48,11 @@ public class Rule {
         return 0;
     }
 
-    // Conways Game of life Rules (B3S23)
-    public byte[][] conwaysBoardRules() {
+    /**
+     * Returns a ruled 2d byte array
+     * @return 2D byte arrey with elements of type byte
+     */
+    public byte[][] applyRules() {
 
         conwaysBoard = new byte[currentBoard.length][currentBoard[0].length];
 
@@ -127,8 +69,12 @@ public class Rule {
 
     }
 
-
-    // Counts the neighbor of a cell and returns value
+    /**
+     * Counts the number of neighbors surrounding the given cell
+     * @param y  y coordinate
+     * @param x  x coordinate
+     * @return  the number of neighbors
+     */
     public int countNeighbor(byte[][] board, int y, int x){
 
         board = currentBoard;
@@ -164,8 +110,6 @@ public class Rule {
 
     }
 
-
-    // Methods that checks whether a cell has a neighbor or not
     private boolean neighborOver(int y, int x) {
 
         if (y - 1 != - 1) {

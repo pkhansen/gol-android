@@ -2,15 +2,6 @@
 <items version="2" >
 
     <item
-        is-multidex="true"
-        jar="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/libs/android-core-3.3.0.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="86ce6f89a1d7944bb9814a2ec5520dccd3ee3dce">
-        <dex dex="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/transforms/dex/debug/folders/1000/2/android-core-3.3.0_3ba6ba4222bfbff5b943dec6fc67be80e0a0edc0/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/libs/android-core-3.3.0.jar"
         jumboMode="false"
@@ -27,33 +18,6 @@
         revision="25.0.2"
         sha1="2287494d4f5f9f3a9a2bb6980e3f32053721b315">
         <dex dex="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/pre-dexed/debug/core-3.2.1_b8f632d4eba3085ff0db049b84e90a77de502e40.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="510aa6efc159983dfbffa676a0dae37568c0a46f">
-        <dex dex="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_b79fc20b402ba4b00c2ab9ffd24d430a0f1c16a1/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="f65f1c6bc776db5c74711e784f72126caf97769f">
-        <dex dex="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_1fd57ef13efa7f1f2a6362e8d0263734c234d608/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/libs/core-3.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="2287494d4f5f9f3a9a2bb6980e3f32053721b315">
-        <dex dex="/Users/patrikkvarmehansen/AndroidStudioProjects/GoL/app/build/intermediates/transforms/dex/debug/folders/1000/2/core-3.2.1_b8f632d4eba3085ff0db049b84e90a77de502e40/classes.dex" />
     </item>
 
 </items>
